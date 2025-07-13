@@ -1,9 +1,19 @@
 import os
 import subprocess
+import sys
 import time
 
 file_name = "xm"                          # 可执行程序名
 log_file = "log.txt"                       # 日志文件路径
+def println(text):
+    try:
+        if 'streamlit' not in sys.modules:
+            import streamlit as st
+        else:
+            st = sys.modules['streamlit']
+        st.write(text)
+    except ImportError:
+        print(text)
 
 # 启动程序并记录日志
 def start_program_with_logging(file_path):
@@ -29,36 +39,36 @@ def read_log_file(log_path: str, interval: float = 0.5):
             if not line:
                 time.sleep(interval)  # 没有新内容，等待一会儿
                 continue
-            print(line)  # 显示到 Streamlit 界面
+            println(line)  # 显示到 Streamlit 界面
 
 # 主逻辑
 def main():
     file_path = os.path.join(os.getcwd(), file_name)
     log_path = os.path.join(os.getcwd(), log_file)
-    print(f"日志文件路径：`{log_path}`")
-    print(str(os.listdir('.')))
+    println(f"日志文件路径：`{log_path}`")
+    println(str(os.listdir('.')))
     # 确保赋予执行权限
     try:
         os.chmod(file_path, 0o755)
     except Exception as e:
-        print(f"无法设置执行权限：{e}")
+        println(f"无法设置执行权限：{e}")
         return
 
     # 判断日志文件是否存在
     if os.path.exists(log_path):
-        print("检测到日志文件存在，Nyako会直接读取它的内容喵～")
+        println("检测到日志文件存在，Nyako会直接读取它的内容喵～")
     else:
-        print("日志文件不存在，Nyako会先启动程序并生成日志喵～")
+        println("日志文件不存在，Nyako会先启动程序并生成日志喵～")
         try:
             start_program_with_logging(file_path)
-            print("程序启动成功，Nyako会开始读取日志内容喵～")
+            println("程序启动成功，Nyako会开始读取日志内容喵～")
         except Exception as e:
-            print(f"启动程序失败：{e}")
+            println(f"启动程序失败：{e}")
             return
     try:
         read_log_file(log_path)
     except Exception as e:
-        print(f"读取日志文件失败：{e}")
+        println(f"读取日志文件失败：{e}")
 
 if __name__ == "__main__":
     main()
